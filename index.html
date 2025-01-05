@@ -112,10 +112,14 @@
 </div>
 
 <script>
+    function formatarData(data) {
+        const [ano, mes, dia] = data.split('-');
+        return `${dia}/${mes}/${ano}`;
+    }
     function gerarTermo() {
         const nomeSolicitante = document.getElementById('nomeSolicitante').value;
         const matriculaSolicitante = document.getElementById('matriculaSolicitante').value;
-        const dataPlantao = document.getElementById('dataPlantao').value;
+        const dataPlantao = formatarData(document.getElementById('dataPlantao').value);
         const horarioPlantao = document.getElementById('horarioPlantao').value;
         const funcao = document.getElementById('funcao').value;
         const departamento = document.getElementById('departamento').value;
@@ -123,25 +127,27 @@
         const motivo = document.getElementById('motivo').value;
         const substituto = document.getElementById('substituto').value;
         const matriculaSubstituto = document.getElementById('matriculaSubstituto').value;
-        const dataCompensacao = document.getElementById('dataCompensacao').value;
+        const dataCompensacao = formatarData(document.getElementById('dataCompensacao').value);
         const horarioCompensacao = document.getElementById('horarioCompensacao').value;
         const horarioCompensacaoFinal = document.getElementById('horarioCompensacaoFinal').value;
 
-        const termo = `EU, ${nomeSolicitante}, 
-        MAT Nº ${matriculaSolicitante}, INFORMO À VOSSA SENHORIA QUE NA DATA DE ${dataPlantao}, 
-        NO HORÁRIO DO PLANTÃO ${horarioPlantao}, ESTAREI IMPOSSIBILITADO(A) DE 
-        COMPARECER AO PLANTÃO NA FUNÇÃO DE ${funcao}, NO DEPARTAMENTO ${departamento} SETOR: ${setor}\n\n` +
-            `EM RAZÃO DO(S) SEGUINTE(S) MOTIVO(S): ${motivo}\n\n\n\n` +
-            `INFORMO, AINDA, QUE ESTARÁ ME SUBSTITUINDO O(A) FUNCIONÁRIO(A) ${substituto}, MAT Nº ${matriculaSubstituto}.\n
-            DE MESMA FUNÇÃO, QUE ESTANDO CIENTE DAS RESPONSABILIDADES E DE ACORDO COM A 
-            SUBSTITUIÇÃO, ABAIXO ASSINA\n` +
-            `DESDE JÁ, DEIXO CONFIRMADA QUE A PERMUTA SERÁ COMPENSADA NO PLANTÃO 
-            DO DIA ${dataCompensacao}, DE ${horarioCompensacao}. ÀS ${horarioCompensacaoFinal}, DE DATA QUE ESTARÁ SOB
-            MINHA RESPONSABILIDADE \n\n` +
-            `ASSINATURA FUNCIONÁRIO SOLICITANTE: ________________________       DATA:__/___/____\n` +
-            `ASSINATURA FUNCIONÁRIO SUBSTITUTO: _________________________       DATA:__/___/____\n` +
-            `ASSINATURA CHEFIA DIRETA: __________________________________       DATA:__/___/____\n` +
-            `DE ACORDO COORDENADORA: ____________________________________       DATA:__/___/____`;
+        const termo = 
+`EU, ${nomeSolicitante},
+MAT Nº ${matriculaSolicitante}, INFORMO À VOSSA SENHORIA QUE NA DATA DE ${dataPlantao},
+NO HORÁRIO DO PLANTÃO ${horarioPlantao}, ESTAREI IMPOSSIBILITADO(A) DE
+COMPARECER AO PLANTÃO NA FUNÇÃO DE ${funcao}, NO DEPARTAMENTO: ${departamento} SETOR: ${setor}\n\n` +
+`EM RAZÃO DO(S) SEGUINTE(S) MOTIVO(S): ${motivo}\n\n\n\n` +
+`INFORMO, AINDA, QUE ESTARÁ ME SUBSTITUINDO O(A) FUNCIONÁRIO(A)\n
+${substituto}, MAT Nº ${matriculaSubstituto}.\n
+DE MESMA FUNÇÃO, QUE ESTANDO CIENTE DAS RESPONSABILIDADES E DE ACORDO COM A
+SUBSTITUIÇÃO, ABAIXO ASSINA\n` +
+`DESDE JÁ, DEIXO CONFIRMADA QUE A PERMUTA SERÁ COMPENSADA NO PLANTÃO
+DO DIA ${dataCompensacao}, DE ${horarioCompensacao}. ÀS ${horarioCompensacaoFinal}, DE DATA QUE ESTARÁ SOB
+MINHA RESPONSABILIDADE\n\n` +
+"ASSINATURA FUNCIONÁRIO SOLICITANTE:_________________________ DATA:   /   /     \n" +
+"ASSINATURA FUNCIONÁRIO SUBSTITUTO: _________________________ DATA:   /   /     \n" +
+"ASSINATURA CHEFIA DIRETA:___________________________________ DATA:   /   /     \n" +
+"DE ACORDO COORDENADORA:_____________________________________ DATA:   /   /     ";
 
         document.getElementById('termoGerado').value = termo;
     }
@@ -158,20 +164,29 @@
         const { jsPDF } = window.jspdf;
         const termo = document.getElementById('termoGerado').value;
 
-        // Gerar o PDF
+
         const doc = new jsPDF();
 
-        // Adicionar cabeçalho com imagem
         const img = new Image();
         img.src = "img/heading.png"; 
 
         doc.addImage(img, 'png', 10, 10, 190, 20);
 
-        // Adicionar o termo gerado
+        const marginLeft = 20;
+        const marginRight = 20;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const usableWidth = pageWidth - marginLeft - marginRight;
         const marginTop = 40;
-        doc.text(termo, 10, marginTop);
 
-        // Salvar o PDF
+        
+        doc.setFont('Arial', 'normal');
+        doc.setFontSize(12);
+        doc.text(termo, marginLeft, marginTop, {
+            align: 'left',
+            maxWidth:usableWidth
+            
+        });
+
         doc.save('termo_permuta.pdf');
     }
 
