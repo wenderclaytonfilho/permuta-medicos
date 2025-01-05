@@ -24,6 +24,10 @@
             max-width: 600px;
             width: 100%;
         }
+        .center{
+            text-align: center;
+            align-items: center;
+        }
         label {
             display: block;
             margin: 10px 0 5px;
@@ -58,7 +62,9 @@
 <body>
 
 <div class="container">
-    <h2>Termo de Permuta de Plantão</h2>
+    <div class="center">
+        <h2>Termo de Permuta de Plantão</h2>
+    </div>
 
     <form id="permutaForm">
         <label for="nomeSolicitante">Nome do Solicitante:</label>
@@ -107,8 +113,10 @@
     <textarea id="termoGerado" readonly></textarea>
 
     <button onclick="copiarTermo()">Copiar</button>
-    <button onclick="salvarComoImagem()">Salvar como Imagem</button>
     <button onclick="salvarComoPDF()">Salvar como PDF</button>
+    <div class="center">
+        <p>&copyWender Clayton | <a href="https://github.com/wenderclaytonfilho" target="_blank">Github</a></p>
+    </div>
 </div>
 
 <script>
@@ -143,11 +151,7 @@ DE MESMA FUNÇÃO, QUE ESTANDO CIENTE DAS RESPONSABILIDADES E DE ACORDO COM A
 SUBSTITUIÇÃO, ABAIXO ASSINA\n` +
 `DESDE JÁ, DEIXO CONFIRMADA QUE A PERMUTA SERÁ COMPENSADA NO PLANTÃO
 DO DIA ${dataCompensacao}, DE ${horarioCompensacao}. ÀS ${horarioCompensacaoFinal}, DE DATA QUE ESTARÁ SOB
-MINHA RESPONSABILIDADE\n\n` +
-"ASSINATURA FUNCIONÁRIO SOLICITANTE:_________________________ DATA:   /   /     \n" +
-"ASSINATURA FUNCIONÁRIO SUBSTITUTO: _________________________ DATA:   /   /     \n" +
-"ASSINATURA CHEFIA DIRETA:___________________________________ DATA:   /   /     \n" +
-"DE ACORDO COORDENADORA:_____________________________________ DATA:   /   /     ";
+MINHA RESPONSABILIDADE\n\n`
 
         document.getElementById('termoGerado').value = termo;
     }
@@ -176,18 +180,22 @@ MINHA RESPONSABILIDADE\n\n` +
         const marginRight = 20;
         const pageWidth = doc.internal.pageSize.getWidth();
         const usableWidth = pageWidth - marginLeft - marginRight;
-        const marginTop = 40;
+        const marginTop = 60;
+        const lines = doc.splitTextToSize(termo, pageWidth);
 
         
         doc.setFont('Arial', 'normal');
-        doc.setFontSize(12);
-        doc.text(termo, marginLeft, marginTop, {
-            align: 'left',
+        doc.setFontSize(13);
+        doc.setLineHeightFactor(2); 
+        doc.text(lines, marginLeft, marginTop,{
+            align:'left',
             maxWidth:usableWidth
-            
-        });
 
-        doc.save('termo_permuta.pdf');
+        });
+        
+
+        const nomeArquivo = `Termo-Permuta ${nomeSolicitante.value}_${dataPlantao.value}.pdf`
+        doc.save(nomeArquivo);
     }
 
     function salvarComoImagem() {
